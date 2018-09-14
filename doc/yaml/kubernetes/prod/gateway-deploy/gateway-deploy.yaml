@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: marge-gateway
-          image: registry.cn-hangzhou.aliyuncs.com/szss-containers/marge-gateway:1.0-SNAPSHOT-37
+          image: registry.cn-songshu.aliyuncs.com/szss-containers/gateway:1.0-SNAPSHOT-30
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
