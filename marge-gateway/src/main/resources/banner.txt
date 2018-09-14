@@ -1,0 +1,11 @@
+   ______      __
+  / ____/___ _/ /____ _      ______ ___  __
+ / / __/ __ `/ __/ _ \ | /| / / __ `/ / / /
+/ /_/ / /_/ / /_/  __/ |/ |/ / /_/ / /_/ /
+\____/\__,_/\__/\___/|__/|__/\__,_/\__, /
+                                  /____/
+
+ascii generator: http://patorjk.com/software/taag/#p=display&f=Slant&t=Gateway
+
+ ${Ansi.BRIGHT_GREEN}:: App Version ::		${Ansi.BRIGHT_CYAN}${application.formatted-version}
+ ${Ansi.DEFAULT}:: Spring Boot Version ::	${spring-boot.formatted-version}

@@ -1,0 +1,13 @@
+version: '2'
+services:
+  db:
+    image: registry.cn-hangzhou.aliyuncs.com/szss/mssql-server-linux:latest
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: yourStrong(!)Password
+      MSSQL_DB: auth
+      MSSQL_USER: admin
+      MSSQL_PASSWORD: Admin123456
+    ports:
+      - "1433:1433"
+    container_name: mssqldev

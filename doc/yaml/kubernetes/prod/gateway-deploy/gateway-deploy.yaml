@@ -1,0 +1,36 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: marge-gateway
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+        - name: marge-gateway
+          image: registry.cn-hangzhou.aliyuncs.com/szss-containers/marge-gateway:1.0-SNAPSHOT-37
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0.1
+              memory: 2048Mi
+            limits:
+              cpu: 0.5
+              memory: 3072Mi
+          env:
+            - name: SERVER_CONTEXT_PATH
+              value: /gateway
+            - name: SPRING_APPLICATION_NAME
+              value: marge-privilege-gateway
+          envFrom:
+            - configMapRef:
+                name: marge-cloud-cm
+            - secretRef:
+                name: marge-cloud-secret
+      imagePullSecrets:
+        - name: aliyun-registry

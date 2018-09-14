@@ -1,0 +1,115 @@
+info:
+  name: marge-gateway
+  gourpId: @project.groupId@
+  artifactId: @project.artifactId@
+  version: @project.version@
+
+#设置应用端口号
+server:
+  port: 8080
+
+
+# config配置
+spring:
+  application:
+    name: marge-gateway
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://127.0.0.1:8761/config
+      username: admin
+      password: admin
+      fail-fast: true
+    bus:
+      enabled: false
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+encrypt:
+  failOnError: false
+
+
+# hystrix线程模式超时时间为60s
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 60000
+
+
+# eureka配置
+eureka:
+  instance:
+    # 注册服务默认心跳时间,默认是30秒，也就是每30秒会向Eureka Server发起Renew操作
+    lease-renewal-interval-in-seconds: 10
+    # 服务失效时间。默认是90秒，也就是如果Eureka Server在90秒内没有接收到来自ServiceProvider的Renew操作，就会把Service Provider剔除。
+    lease-expiration-duration-in-seconds: 20
+    # 使用IP
+    prefer-ip-address: true
+    # 元数据，发送到eureka服务并存储，其他服务可以获取到该元数据
+    metadata-map:
+      #user.name: ${security.user.name}
+      #user.password: ${security.user.password}
+      # 配置说明：http://codecentric.github.io/spring-boot-admin/1.5.7/#_converting_serviceinstances_into_monitored_applications
+      management.context-path: /mgmt
+      health.path: /mgmt/health
+      instanceId: ${spring.application.name}:${random.value}
+      name: 路由服务
+      description: marge-cloud项目路由服务
+      ui: false
+  client:
+    # 表示eureka client间隔多久去拉取服务注册信息，默认为30秒，对于gateway，如果要迅速获取服务注册状态，可以缩小该值
+    registry-fetch-interval-seconds: 5
+    # 是否从eureka上获取注册信息
+    fetch-registry: true
+    # 表示是否注册自身到eureka服务器
+    register-with-eureka: true
+    # eureka服务的URL
+    service-url:
+      defaultZone: http://admin:admin@127.0.0.1:8761/eureka/
+    # 是否开启erureka客户端
+    enabled: true
+
+
+# mybatis配置
+#mybatis:
+#  config-location: classpath:mybatis-config.xml
+mybatis-plus:
+# 如果是放在src/main/java目录下 classpath:/com/yourpackage/*/mapper/*Mapper.xml
+# 如果是放在resource目录 classpath:/mapper/*Mapper.xml
+#  mapper-locations: classpath:/mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.szss.marge.gateway.model.domain
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 1
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新mapper 调试神器
+    #refresh-mapper: true
+    #数据库大写下划线转换
+    capital-mode: true
+    # Sequence序列接口实现类配置
+    #key-generator: com.baomidou.mybatisplus.incrementer.OracleKeyGenerator
+    #逻辑删除配置（下面3个配置）
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    #自定义填充策略接口实现
+    #meta-object-handler: com.baomidou.springboot.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull
+    jdbc-type-for-null: 'null'
+
+oauth:
+  application:
+    name: marge-auth-server
+  context-path: /uaa

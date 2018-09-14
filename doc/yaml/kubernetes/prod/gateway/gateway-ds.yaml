@@ -1,0 +1,33 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: panther-gateway
+spec:
+  template:
+    metadata:
+      labels:
+        app: panther
+    spec:
+      containers:
+        - name: panther-gateway
+          image: registry.cn-hangzhou.aliyuncs.com/szss-containers/marge-gateway:1.0-SNAPSHOT-30
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 0.1
+              memory: 2048Mi
+            limits:
+              cpu: 0.5
+              memory: 3072Mi
+          env:
+            - name: SERVER_CONTEXT_PATH
+              value: /panther
+          envFrom:
+            - configMapRef:
+                name: marge-cloud-cm
+            - secretRef:
+                name: marge-cloud-secret
+      imagePullSecrets:
+        - name: aliyun-registry

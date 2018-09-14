@@ -1,0 +1,13 @@
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v1
+metadata:
+  name: marge-gateway-hpa
+spec:
+  minReplicas: 1
+  maxReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1beta1
+    kind: Deployment
+    name: gateway
+  targetCPUUtilizationPercentage: 80
+

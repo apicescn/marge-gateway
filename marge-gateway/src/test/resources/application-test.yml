@@ -1,0 +1,153 @@
+spring:
+  application:
+    name: marge-gateway
+  aop:
+    proxy-target-class: true
+  rabbitmq:
+     host: ${maven_docker.ip}
+     port: 5672
+     username: guest
+     password: guest
+  redis:
+      host: ${maven_docker.ip}
+      password: 123456
+
+# 数据库配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:sqlserver://${maven_docker.ip}:1433;databaseName=gateway;loginTimeout=30;
+    username: sa
+    password: yourStrong(!)Password
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    druid:
+      validationQuery: SELECT 1
+      initialSize: 10
+      minIdle: 10
+      maxActive: 200
+      minEvictableIdleTimeMillis: 180000
+      testOnBorrow: false
+      testWhileIdle: true
+      removeAbandoned: true
+      removeAbandonedTimeout: 1800
+      logAbandoned: true
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 100
+
+# 单元测试需要关闭eureka客户端
+eureka:
+  client:
+    enabled: false
+
+flyway:
+  enabled: true
+
+jetcache:
+  statIntervalMinutes: 15
+  areaInCacheName: false
+  local:
+    default:
+      type: linkedhashmap
+      keyConvertor: fastjson
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson
+      valueEncoder: java
+      valueDecoder: java
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      host: 127.0.0.1
+      port: 6379
+
+
+zuul:
+  threadPool:
+    # zuul为每个路由提供一个线程池
+    useSeparateThreadPools: true
+    # 线程池前缀
+    threadPoolKeyPrefix: gw
+  # 获取所有服务
+  ignoredServices: '*'
+  # 不对head进行过滤
+  sensitive-headers: '*'
+  # 如果网关有其他业务接口，那么需要设置路由前缀，让这些网关的业务接口可以被访问
+  prefix: /router
+  # 路由
+  routes:
+    marge-admin-server-ui: /adminui/**
+    marge-admin-server: /admin/**
+
+#    panther-member: /member/**
+
+
+# ribbon的饥饿加载eureka配置信息
+ribbon:
+  # 连接超时，使用Apache HttpClient配置有效
+  ConnectTimeout: 3000
+  # 读取超时，使用Apache HttpClient配置有效
+  ReadTimeout: 60000
+  eager-load:
+    # 开启ribbon饥饿加载eureka配置信息
+    enabled: true
+    # 指定加载的服务名称，只有自定的服务才进行加载
+    clients: marge-admin-server,marge-auth-server
+
+# oauth配置
+security:
+  basic:
+    enabled: false
+  oauth2:
+    client:
+      clientId: admin
+      clientSecret: 7a57a5a743894a0e
+      access-token-uri: http://127.0.0.1:7777/uaa/oauth/token
+      user-authorization-uri: http://127.0.0.1:7777/uaa/oauth/authorize
+      grant-type: client_credentials
+    resource:
+      jwt:
+        key-uri: http://127.0.0.1:7777/uaa/oauth/token_key
+        #key-value: M3NvbmdzaHUuY29t
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.springframework.cloud: WARN
+    org.springframework.web: WARN
+
+# mybatis配置
+#mybatis:
+#  config-location: classpath:mybatis-config.xml
+mybatis-plus:
+# 如果是放在src/main/java目录下 classpath:/com/yourpackage/*/mapper/*Mapper.xml
+# 如果是放在resource目录 classpath:/mapper/*Mapper.xml
+#  mapper-locations: classpath:/mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.szss.marge.gateway.model.domain
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 1
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #刷新mapper 调试神器
+    #refresh-mapper: true
+    #数据库大写下划线转换
+    capital-mode: true
+    # Sequence序列接口实现类配置
+    #key-generator: com.baomidou.mybatisplus.incrementer.OracleKeyGenerator
+    #逻辑删除配置（下面3个配置）
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    sql-injector: com.baomidou.mybatisplus.mapper.LogicSqlInjector
+    #自定义填充策略接口实现
+    #meta-object-handler: com.baomidou.springboot.MyMetaObjectHandler
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    #配置JdbcTypeForNull
+    jdbc-type-for-null: 'null'

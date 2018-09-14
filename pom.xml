@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.szss.marge</groupId>
+  <artifactId>gateway</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <parent>
+    <groupId>com.szss</groupId>
+    <artifactId>szss-spring</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+
+  <modules>
+    <module>marge-commons</module>
+    <module>marge-gateway</module>
+  </modules>
+
+  <properties>
+    <docker.image.prefix>szss-containers</docker.image.prefix>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!--注解反射-->
+      <dependency>
+        <groupId>org.reflections</groupId>
+        <artifactId>reflections</artifactId>
+        <version>${reflections.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <repositories>
+    <!--aliyun仓库-->
+    <repository>
+      <id>aliyun</id>
+      <name>aliyun</name>
+      <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+      <layout>default</layout>
+    </repository>
+    <!--docker单元测试-->
+    <repository>
+      <id>palantir</id>
+      <name>palantir</name>
+      <url>https://dl.bintray.com/palantir/releases</url>
+      <layout>default</layout>
+    </repository>
+    <!--避免mvn site报错-->
+    <repository>
+      <id>spring</id>
+      <name>spring</name>
+      <url>http://repo.spring.io/plugins-release</url>
+    </repository>
+    <!--spring milestones-->
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/libs-milestone</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <profiles>
+    <profile>
+      <id>dev</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <maven_spring.profiles.active>dev</maven_spring.profiles.active>
+        <maven_docker.ip>127.0.0.1</maven_docker.ip>
+      </properties>
+    </profile>
+    <profile>
+      <id>prod</id>
+      <properties>
+        <maven_spring.profiles.active>prod</maven_spring.profiles.active>
+      </properties>
+    </profile>
+  </profiles>
+</project>

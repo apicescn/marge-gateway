@@ -1,0 +1,121 @@
+spring:
+  profiles: dev
+  aop:
+    proxy-target-class: true
+  rabbitmq:
+     host: ${maven_docker.ip}
+     port: 5672
+     username: guest
+     password: guest
+  redis:
+      host: ${maven_docker.ip}
+      password: 123456
+
+# 数据库配置
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:sqlserver://${maven_docker.ip}:1433;databaseName=gateway;loginTimeout=30;
+    username: sa
+    password: yourStrong(!)Password
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    druid:
+      validationQuery: SELECT 1
+      initialSize: 10
+      minIdle: 10
+      maxActive: 200
+      minEvictableIdleTimeMillis: 180000
+      testOnBorrow: false
+      testWhileIdle: true
+      removeAbandoned: true
+      removeAbandonedTimeout: 1800
+      logAbandoned: true
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 100
+
+
+flyway:
+  enabled: true
+
+jetcache:
+  statIntervalMinutes: 1
+  areaInCacheName: false
+#  local:
+#    default:
+#      type: linkedhashmap
+#      keyConvertor: fastjson
+  remote:
+    default:
+      type: redis
+      keyConvertor: fastjson
+      valueEncoder: java
+      valueDecoder: java
+      poolConfig:
+        minIdle: 5
+        maxIdle: 20
+        maxTotal: 50
+      host: 127.0.0.1
+      port: 6379
+      password: 123456
+
+
+zuul:
+  threadPool:
+    # zuul为每个路由提供一个线程池
+    useSeparateThreadPools: true
+    # 线程池前缀
+    threadPoolKeyPrefix: gw
+  # 获取所有服务
+  ignoredServices: '*'
+  # 不对head进行过滤
+  sensitive-headers: '*'
+  # 如果网关有其他业务接口，那么需要设置路由前缀，让这些网关的业务接口可以被访问
+  prefix: /router
+  # 路由
+  routes:
+    marge-admin-server-ui: /adminui/**
+    marge-admin-server: /admin/**
+    hulk-wd-openapi: /wd/**
+    shield-middle: /middle/**
+    jarvis-data-warehouse: /idw/**
+#    panther-member: /member/**
+
+
+# ribbon的饥饿加载eureka配置信息
+ribbon:
+  # 连接超时，使用Apache HttpClient配置有效
+  ConnectTimeout: 3000
+  # 读取超时，使用Apache HttpClient配置有效
+  ReadTimeout: 60000
+  eager-load:
+    # 开启ribbon饥饿加载eureka配置信息
+    enabled: true
+    # 指定加载的服务名称，只有自定的服务才进行加载
+    clients: marge-admin-server,marge-auth-server
+
+# 单点登录是否开启
+sso:
+  enabled: false
+# oauth配置
+security:
+  basic:
+    enabled: false
+  sessions: ALWAYS
+  oauth2:
+    client:
+      clientId: admin
+      clientSecret: 7a57a5a743894a0e
+      access-token-uri: http://127.0.0.1:7777/uaa/oauth/token
+      user-authorization-uri: http://127.0.0.1:7777/uaa/oauth/authorize
+      grant-type: client_credentials
+    resource:
+      jwt:
+        key-uri: http://127.0.0.1:7777/uaa/oauth/token_key
+        #key-value: M3NvbmdzaHUuY29t
+
+
+logging:
+  level:
+    root: INFO
+    org.springframework.security: WARN
+    org.springframework.cloud: WARN
+    org.springframework.web: WARN
